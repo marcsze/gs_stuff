@@ -31,3 +31,8 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+
+# Ignore custom files
+Koren2012.pdf
+Koren2012_suppl.pdf
+
