@@ -187,8 +187,8 @@ imp_otus <- varImp(training_model, scale = FALSE)[["importance"]] %>%
   
 
 # Write out the tables to be graphed
-
-
+write_csv(predictions_from_model, "data/process/tables/probability_scores.csv")
+write_csv(imp_otus, "data/process/tables/imp_otus_to_model.csv")
 
 
 
