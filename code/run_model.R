@@ -139,9 +139,13 @@ make_rf_model <- function(dataList, train_data_name){
 
 
 # Function to create a temp test table with calls used for the train model
-make_temp_test_data <- function(){
+make_temp_test_data <- function(dataList, test_data_name, pattern_key){
   
+  tempData <- dataList[[test_data_name]] %>% 
+    mutate(TIME_OF_SAMPLING = stringr::str_replace_all(TIME_OF_SAMPLING, pattern_key), 
+           TIME_OF_SAMPLING = factor(TIME_OF_SAMPLING))
   
+  return(tempData)
   
 }
 
@@ -165,6 +169,27 @@ rf_nzv_completed <- run_nzv(rf_data, "train_data", "test_data")
 
 # Create the RF model
 training_model <- make_rf_model(rf_nzv_completed, "train_data")
+
+# Create the temp test data
+temp_test_data <- make_temp_test_data(rf_nzv_completed, "test_data", 
+                                      c("3rd_tri" = "adult", "1_month_post" = "adult", 
+                                        "6_month_old" = "child", "4_years_old" = "child"))
+
+# Run the prediction
+predictions_from_model <- predict(training_model, temp_test_data, type = "prob") %>% 
+  mutate(TIME_OF_SAMPLING = rf_nzv_completed[["test_data"]]$TIME_OF_SAMPLING)
+
+
+# Generate the most important variables to the model
+imp_otus <- varImp(training_model, scale = FALSE)[["importance"]] %>% 
+  mutate(otu = rownames(.), mda = mother) %>% arrange(desc(mda)) %>% 
+  select(otu, mda)
+  
+
+# Write out the tables to be graphed
+
+
+
 
 
 
