@@ -1,0 +1,78 @@
+---
+title: "Interview Report"
+author: "Marc Sze"
+date: "October 14, 2017"
+output: html_document
+---
+
+```{r settings, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+library(tidyverse)
+
+```
+
+
+
+```{r data_tables, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+
+wilcox_data <- as.data.frame(read_csv("../results/tables/wilcox_comparisons.csv"))
+
+
+```
+
+
+
+
+### Investigating the Microbiota between Enfants, Children, and Mothers
+
+<br>
+
+#### Statistical Tests and Analysis Methods Used
+
+* Random Forest
+* Wilcoxson Rank Sum
+* Benjamini-Hochberg Multiple Comparison Correction
+
+#### Reasons for Choosing these Methods
+
+I wanted to improve upon the the figure found in Figure 4 of the [Koren, et al. 2012 study](http://www.cell.com/cell/fulltext/S0092-8674(12)00829-X). Although it is possible to infer that the microbiota is getting more similar between children and their mothers, this is not easily interpretable from the figure that is presented. It also required matched child and mother sample pairs. I wanted to specifically ask the question whether the phenomenon described in the [Koren, et al. 2012 study](http://www.cell.com/cell/fulltext/S0092-8674(12)00829-X) was generalizable across groups (i.e. did not need matching pairs). Secondly, I wanted to know if I could identify what was important for the model classifications being made as to whether the microbiota was an adult mother or not.    
+
+In order to do this I choose to use the Random Forest (RF) machine learning algorithm. The benefits of the model are that it takes into account the interdependency of the otus, it does not need data to be normal, and it can deal with 0 inflated data without too much problems. This makes it superior to general linear models and feature selection algorithms, such as LEfSe.
+
+The prediction function that I used in R (v`r R.Version()$major`.`r R.Version()$minor`) returns a probability of whether or not the sample is an adult mother. This data is unlikely to be normally distributed so to be conservative when testing for significance I used the Wilcoxson Rank Sum Test. To correct for multiple comparisons I used the Benjamini-Hochberg method as opposed to the Bonferroni correction since the latter can be overly stringent and result in more false negatives. All P-values that are reported herein are those that have been corrected for multiple comparisons.
+
+
+#### Results of the analysis
+
+**Figure 1: Transition of Bacterial Community from Child to Adult**
+
+
+![](../results/figures/prbability_figure.tiff)
+
+
+Overall there was a significant difference between all groups and the six-month old enfants, with respect to the model probability of being an adult mother (P-value `r ifelse(max(filter(wilcox_data, g1 == "6_month_old", g2 == "6_month_old")[, "bh"]) < 0.05, invisible("<"), invisible("not all are sig"))` 0.05). Interestingly, using RF gives more granularity then what was originally used in the manuscript and although the 4 year olds do have an increased probability of being an adult their probability is significantly lower then both the adult mothers during the third trimester (P-value = `r format(filter(wilcox_data, g1 == "3rd_tri", g2 == "4_years_old")[, "bh"], digits = 3, nsmall = 3)`) and adult mothers 1 month after pregnancy (P-value = `r format(filter(wilcox_data, g1 == "1_month_post", g2 == "4_years_old")[, "bh"], digits = 2, nsmall = 2)`). 
+
+
+
+**Figure 2: Top 30 OTUs within the Model**
+
+
+![](../results/figures/imp_otu_figure.tiff)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
