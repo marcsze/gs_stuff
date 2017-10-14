@@ -119,6 +119,9 @@ make_rf_model <- function(dataList, train_data_name){
   # Set the mtry hyperparameter for the training model
   tunegrid <- expand.grid(.mtry = number_try)
   
+  # set seed to make the data the same each run
+  set.seed(1234567)
+  
   # Train the model
   training_model <- 
     train(TIME_OF_SAMPLING ~ ., data = tempdata, 
