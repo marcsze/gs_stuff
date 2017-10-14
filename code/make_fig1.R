@@ -29,7 +29,7 @@ probs_graph <- graph_data %>%
         axis.text = element_text(size = 10))
   
 # Write out the figure
-ggsave("results/figures/prbability_figure.tiff", probs_graph, width = 6, height = 5, dpi = 300)
+ggsave("results/figures/prbability_figure.tiff", probs_graph, width = 7, height = 5, dpi = 300)
 
 
 
