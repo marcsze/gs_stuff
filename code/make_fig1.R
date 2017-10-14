@@ -28,7 +28,8 @@ probs_graph <- graph_data %>%
         panel.grid.minor = element_blank(), 
         axis.text = element_text(size = 10))
   
-  
+# Write out the figure
+ggsave("results/figures/prbability_figure.tiff", probs_graph, width = 6, height = 5, dpi = 300)
 
 
 
