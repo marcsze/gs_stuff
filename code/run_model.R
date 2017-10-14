@@ -22,6 +22,7 @@ all_data <- meta_data %>% inner_join(abund_data, by = "DATA_ID")
 ################################## List to store used functions ###############################################
 ###############################################################################################################
 
+# Function to seperate the different data groups so that I can recombine them as needed
 seperate_data_by_groups <- function(data_table, groups){
   
   tempData <- sapply(groups, 
@@ -34,6 +35,115 @@ seperate_data_by_groups <- function(data_table, groups){
 }
 
 
+# Function to create different combinations of test and train sets as needed
+make_combination <- function(dataList, test_names, train_names){
+  
+  tempData <- dataList %>% bind_rows()
+  
+  tempTest <- tempData %>% filter(TIME_OF_SAMPLING %in% test_names)
+  
+  tempTrain <- tempData %>% filter(TIME_OF_SAMPLING %in% train_names)
+  
+  finalData <- list(
+    train_data = tempTrain, 
+    test_data = tempTest)
+  
+  return(finalData)
+}
+
+# Function to remove near zero variance OTUs
+run_nzv <- function(dataList, train_name, test_name){
+  
+  tempTrain <- dataList[[train_name]]
+  groupTrainIDs <- tempTrain$TIME_OF_SAMPLING
+  
+  tempTest <- dataList[[test_name]]
+  groupTestIDs <- tempTest$TIME_OF_SAMPLING
+  
+  nzv <- nearZeroVar(tempTrain)
+  
+  if(length(nzv) == 0){
+    
+    tempTrain <- tempTrain
+    tempTest <- tempTest
+    
+  } else{
+    
+    tempTrain <- tempTrain[, -nzv]
+    tempTest <- tempTest[, -nzv]
+    
+    if("TIME_OF_SAMPLING" %in% colnames(tempTrain)){
+      
+      print("groups were not removed...no correction required")
+      
+    } else{
+      
+      tempTrain <- cbind(groupTrainIDs, tempTrain)
+      tempTest <- cbind(groupTestIDs, tempTest)
+      
+      print("groups were removed...correcting this problem")
+    }
+  }
+  
+  finalData <- list(train_data = tempTrain, 
+                    test_data = tempTest)
+  
+  return(finalData)
+}
+
+
+# Function that builds the model
+make_rf_model <- function(dataList, train_data_name){
+  
+  tempdata <- dataList[[train_data_name]] %>% 
+    mutate(TIME_OF_SAMPLING = factor(TIME_OF_SAMPLING, 
+                                     levels = c("1st_tri", "1_month_old"), 
+                                     labels = c("mother", "child")))
+  
+  
+  #Create Overall specifications for model tuning
+  # number controls fold of cross validation
+  # Repeats control the number of times to run it
+  fitControl <- trainControl(## 10-fold CV
+    method = "cv",
+    number = 10,
+    p = 0.8,
+    classProbs = TRUE, 
+    summaryFunction = twoClassSummary, 
+    savePredictions = "final")
+  
+  # Set the mtry to be based on the number of total variables in data table to be modeled
+  # this formula seems to be an accepted default to use
+  number_try <- round(sqrt(ncol(tempdata)))
+  
+  # Set the mtry hyperparameter for the training model
+  tunegrid <- expand.grid(.mtry = number_try)
+  
+  # Train the model
+  training_model <- 
+    train(TIME_OF_SAMPLING ~ ., data = tempdata, 
+          method = "rf", 
+          ntree = 500, 
+          trControl = fitControl,
+          tuneGrid = tunegrid, 
+          metric = "ROC", 
+          importance = TRUE, 
+          na.action = na.omit, 
+          verbose = FALSE)
+  
+  # Return the model object
+  return(training_model)
+  
+}
+
+
+
+# Function to create a temp test table with calls used for the train model
+make_temp_test_data <- function(){
+  
+  
+  
+}
 
 
 
@@ -42,10 +152,19 @@ seperate_data_by_groups <- function(data_table, groups){
 ###################################### Execute the given functions #############################################
 ################################################################################################################
 
+# runs the seperation function and allows for each group to be seperate
 seperate_data <- seperate_data_by_groups(all_data, c("1st_tri", "3rd_tri", "1_month_post", 
                                                      "1_month_old", "6_month_old", "4_years_old"))
 
+# Creates the needed test and train sets for the RF
+rf_data <- make_combination(seperate_data, c("3rd_tri", "1_month_post", "6_month_old", "4_years_old"), 
+                            c("1st_tri", "1_month_old"))
 
+# Removes the nzv variables from both test and train data sets
+rf_nzv_completed <- run_nzv(rf_data, "train_data", "test_data")
+
+# Create the RF model
+training_model <- make_rf_model(rf_nzv_completed, "train_data")
 
 
 
