@@ -177,7 +177,8 @@ temp_test_data <- make_temp_test_data(rf_nzv_completed, "test_data",
 
 # Run the prediction
 predictions_from_model <- predict(training_model, temp_test_data, type = "prob") %>% 
-  mutate(TIME_OF_SAMPLING = rf_nzv_completed[["test_data"]]$TIME_OF_SAMPLING)
+  mutate(TIME_OF_SAMPLING = rf_nzv_completed[["test_data"]]$TIME_OF_SAMPLING) %>% 
+  rename(yes_adult = mother, no_adult = child)
 
 
 # Generate the most important variables to the model
