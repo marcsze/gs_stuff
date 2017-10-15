@@ -51,7 +51,7 @@ The prediction function that I used in R (v`r R.Version()$major`.`r R.Version()$
 ![](../results/figures/nmds_figure.tiff)
 
 
-Although there is clear separation 
+Although there is clear separation between the infants and the adults. This difference does not seem to hold between the 4 year old age group and the adults. Even if there was a difference it would be very hard to spot this using this specific method. So the question is whether a different approach may provide more information then what we observe on NMDS.
 
 
 **Figure 2: Transition of Bacterial Community from Child to Adult**
@@ -60,7 +60,7 @@ Although there is clear separation
 ![](../results/figures/prbability_figure.tiff)
 
 
-Overall there was a significant difference between all groups and the six-month old infants, with respect to the model probability of being an adult mother (P-value `r ifelse(max(filter(wilcox_data, g1 == "6_month_old", g2 == "6_month_old")[, "bh"]) < 0.05, invisible("<"), invisible("not all are sig"))` 0.05). Interestingly, using RF gives more granularity then what was originally used in the manuscript and although the 4 year old do have an increased probability of being an adult their probability is significantly lower then both the adult mothers during the third trimester (P-value = `r format(filter(wilcox_data, g1 == "3rd_tri", g2 == "4_years_old")[, "bh"], digits = 3, nsmall = 3)`) and adult mothers 1 month after pregnancy (P-value = `r format(filter(wilcox_data, g1 == "1_month_post", g2 == "4_years_old")[, "bh"], digits = 2, nsmall = 2)`). 
+Overall there was a significant difference between all groups and the six-month old infants, with respect to the model probability of being an adult mother (P-value `r ifelse(max(filter(wilcox_data, g1 == "6_month_old", g2 == "6_month_old")[, "bh"]) < 0.05, invisible("<"), invisible("not all are sig"))` 0.05). Interestingly, using RF gives more granularity then what was originally used in the manuscript. Although the 4 year old age group do have an increased probability of being an adult their probability is significantly lower then both the adult mothers during the third trimester (P-value = `r format(filter(wilcox_data, g1 == "3rd_tri", g2 == "4_years_old")[, "bh"], digits = 3, nsmall = 3)`) and adult mothers 1 month after pregnancy (P-value = `r format(filter(wilcox_data, g1 == "1_month_post", g2 == "4_years_old")[, "bh"], digits = 2, nsmall = 2)`). 
 
 
 

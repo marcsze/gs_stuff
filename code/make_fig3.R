@@ -34,7 +34,11 @@ nmds_graph <- graph_data %>%
   labs(x = "NMDS1", y = "NMDS2") + 
   theme(axis.title = element_text(face = "bold"), 
         panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(), 
+        panel.grid.minor = element_blank(),
+        legend.position = c(0.83, 0.87),
+        legend.key = element_blank(), 
+        legend.text = element_text(size = 8),
+        legend.background = element_blank(), 
         axis.text = element_text(size = 10))
 
 # Write out the figure
