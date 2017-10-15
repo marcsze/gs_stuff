@@ -11,6 +11,17 @@ library(viridis)
 graph_data <- read_csv("data/process/tables/imp_otus_to_model.csv") %>% 
   slice(1:30) %>% arrange(mda)
 
+tax_data <- read_tsv("data/process/select_fasta_classified.txt", col_names = F) %>% 
+  rename(domain = X8, phylum = X11, class = X14, order = X17, family = X20, 
+         genus = X23, otu = X1) %>% 
+  select(-X2, -X3, -X4, -X5, -X7, -X10, -X13, -X16, -X19, -X22) %>%  
+  gather(key = taxa, value = percent_match, domain, phylum, 
+                            class, order, family, genus) %>% 
+  rename(domain = X6, phylum = X9, class = X12, order = X15, family = X18, genus = X21)
+
+# Select only the lowest ID to use
+
+
 
 # Create the graph of the data
 imp_otu_graph <- graph_data %>% 
