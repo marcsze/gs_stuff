@@ -19,15 +19,61 @@ tax_data <- read_tsv("data/process/select_fasta_classified.txt", col_names = F) 
                             class, order, family, genus) %>% 
   rename(domain = X6, phylum = X9, class = X12, order = X15, family = X18, genus = X21)
 
-# Select only the lowest ID to use
+# Select only the lowest ID to use for each OTU
+genus_otus <- as.data.frame(filter(tax_data, percent_match >= 0.6, taxa == "genus"))[, "otu"]
+family_otus <- as.data.frame(filter(tax_data, percent_match >= 0.6, taxa == "family", 
+                                    !(otu %in% genus_otus)))[, "otu"]
+order_otus <- as.data.frame(filter(tax_data, percent_match >= 0.6, taxa == "order", 
+                                   !(otu %in% genus_otus), 
+                                   !(otu %in% family_otus)))[, "otu"]
+phylum_otus <- as.data.frame(filter(tax_data, percent_match >= 0.6, taxa == "phylum", 
+                                   !(otu %in% genus_otus), 
+                                   !(otu %in% family_otus), 
+                                   !(otu %in% order_otus)))[, "otu"]
+domain_otus <- as.data.frame(filter(tax_data, percent_match >= 0.6, taxa == "domain", 
+                                    !(otu %in% genus_otus), 
+                                    !(otu %in% family_otus), 
+                                    !(otu %in% order_otus), 
+                                    !(otu %in% phylum_otus)))[, "otu"]
+
+# Create label call within graph data table
+
+graph_data <- graph_data %>% 
+  inner_join(tax_data, by = "otu") %>% 
+  mutate(label_call = ifelse(otu %in% genus_otus, invisible(genus), 
+                             ifelse(otu %in% family_otus, invisible(family), 
+                                    ifelse(otu %in% order_otus, invisible(order), 
+                                           ifelse(otu %in% phylum_otus, invisible(phylum), 
+                                                  invisible(domain)))))) %>% 
+  distinct(otu, .keep_all = TRUE) %>% 
+  select(otu, mda, label_call)
+
+
+# Generate the labels needed for the MDA graph
+otu_num <- as.numeric(gsub("otu", "", graph_data$otu))
+low_tax_ID <- gsub("_", " ", graph_data$label_call)
+
+graph_labels <- paste(gsub("_", " ", graph_data$label_call), " (OTU", otu_num, ")", sep = "")
+
+test <- c()
+for(i in 1:length(low_tax_ID)){
+  
+  test <- c(test, bquote(paste(italic(.(low_tax_ID[i])) ~ "(OTU", .(otu_num[i]), ")", sep = "")))
+  
+}
+
+used_graph_labels <- do.call(expression, test)
 
 
 
 # Create the graph of the data
 imp_otu_graph <- graph_data %>% 
-  mutate(otu = factor(otu, levels = graph_data$otu)) %>% 
+  mutate(otu = factor(otu, 
+                      levels = graph_data$otu, 
+                      labels = graph_labels)) %>% 
   ggplot(aes(x = otu, y = mda)) + 
   geom_point(show.legend = F, size = 4) + 
+  scale_x_discrete(labels = used_graph_labels) + 
   coord_flip() + 
   theme_bw() + 
   labs(y = "Mean Decrease in Accuracy", x = "") + 
