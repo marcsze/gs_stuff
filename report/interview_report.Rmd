@@ -23,7 +23,7 @@ wilcox_data <- as.data.frame(read_csv("../results/tables/wilcox_comparisons.csv"
 
 
 
-### Investigating the Microbiota between Enfants, Children, and Mothers
+### Investigating the Microbiota between Infants, Children, and Mothers
 
 <br>
 
@@ -73,6 +73,18 @@ Overall there was a significant difference between all groups and the six-month 
 Although the lowest taxonomic ID for some of the OTUs was only able to identify them as bacteria, there are still a few interesting things going on based on the other taxonomic identifications. The top OTU identified as most important to the model classifies to a bacterium that is typically found in [coral and oceans](https://www.ncbi.nlm.nih.gov/pubmed/?term=Flammeovirgaceae). Alternatively, I set the taxonomic ID threshold to a very liberal 60% and it is possible that this is not really the true ID of this OTU. This makes me suspicious that contamination was not an issue during the completion of this study. In contrast, there do appear to biologically relevant gut OTUs that are central to this model. Both *Bacteroides* and *Faecalibacterium* are known to be resident gut microbes and are important to both health and disease states. 
 
 
+#### Drug Targets
+
+At this point in time it would be premature to suggest drug targets of any kind. Although there looks to be potential use case interventions for prebiotics or even probiotics to normalize the microbiota coupled with a microbiota test to track community development. This area would need more specific studies looking at the impact of such treatments as well as the sensitivity of the model before any firm recommendations can be made. 
+
+
+#### Future Plans
+
+* The first option that could be followed up on would be to use a bioinformatic program, such as picrust, to infer what potential metabolite targets could be based on this community distribution.
+* Another viable alternative would be to run the analysis again but using metagenomics instead of 16S
+    * One benefit of this approach is that the actual gene content would not be inputed.
+* If modeling is the goal (e.g. predicting if infants are on a "regular" microbial succession time frame) then it might be reasonable to test this model on a new independent data set.
+* Follow up on the potential contamination component.
 
 
 
