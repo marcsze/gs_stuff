@@ -60,7 +60,7 @@ Overall there was a significant difference between all groups and the six-month 
 ![](../results/figures/imp_otu_figure.tiff)
 
 
-
+Although the lowest taxonmic ID for some of the OTUs was only able to identify them as bacteria, there are still a few interesting things going on based on the other taxnomic identifications. The top OTU identified as most important to the model classifies to a bacterium that is typically found in [coral and oceans](https://www.ncbi.nlm.nih.gov/pubmed/?term=Flammeovirgaceae). Alternatively, I set the taxonomic ID threshold to a very liberal 60% and it is possible that this is not really the true ID of this OTU. This makes me suspicious that contamination was not an issue during the completion of this study. In contrast, there do appear to biologically relevant gut OTUs that are central to this model. Both *Bacteroides* and *Faecalibacterium* are known to be resident gut microbes and are important to both health and disease states. 
 
 
 
