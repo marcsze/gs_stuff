@@ -23,7 +23,7 @@ nmds_graph <- graph_data %>%
   mutate(age_group = factor(age_group, 
                             levels = c("1_month_old", "6_month_old", "4_years_old", "1st_tri", 
                                        "3rd_tri", "1_month_post"), 
-                            labels = c("One-Month Enfant", "Six-Month Enfant", "Four Year Old Child", 
+                            labels = c("One-Month Infant", "Six-Month Infant", "Four Year Old Child", 
                                        "Mother (1st Trimester)", "Mother (3rd Trimester)", 
                                        "Mother\n(1-month Post Pregnancy)"))) %>% 
   ggplot(aes(x=nmds1, y=nmds2, color=age_group)) + 

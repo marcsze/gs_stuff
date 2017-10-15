@@ -15,7 +15,7 @@ probs_graph <- graph_data %>%
   rename(age_group = TIME_OF_SAMPLING) %>% 
   mutate(age_group = factor(age_group, 
                             levels = c("6_month_old", "4_years_old", "3rd_tri", "1_month_post"), 
-                            labels = c("Six-Month Enfant", "Four Year Old Child", 
+                            labels = c("Six-Month Infant", "Four Year Old Child", 
                                        "Mother\n(3rd Trimester)", "Mother\n(1-month Post Pregnancy)"))) %>% 
   ggplot(aes(x = age_group, y = yes_adult, color = age_group)) + 
   geom_jitter(width = 0.2, size = 3, alpha = 0.75, show.legend = F) +
