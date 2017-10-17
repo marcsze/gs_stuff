@@ -24,12 +24,15 @@ all_data <- meta_data %>% inner_join(abund_data, by = "DATA_ID")
 
 # Function to seperate the different data groups so that I can recombine them as needed
 seperate_data_by_groups <- function(data_table, groups){
+  # data_table is the data of interest
+  # groups is the different groups by which one wants to separate the data by
   
+  # generate the separation 
   tempData <- sapply(groups, 
                      function(x) data_table %>% 
                        filter(TIME_OF_SAMPLING == x) %>% 
                        select(TIME_OF_SAMPLING, contains("otu")), simplify = F)
-  
+  # Write the tabel to the global work environment
   return(tempData)
   
 }
@@ -37,64 +40,75 @@ seperate_data_by_groups <- function(data_table, groups){
 
 # Function to create different combinations of test and train sets as needed
 make_combination <- function(dataList, test_names, train_names){
+  # dataList is the list generated from the seperate_data_by_groups function
+  # test_names is the names of the groups in the test set
+  # train_names if the names of the groups in the train set
   
+  # Convert the dataList to a data frame
   tempData <- dataList %>% bind_rows()
-  
+  # keep only samples in the test_names vector
   tempTest <- tempData %>% filter(TIME_OF_SAMPLING %in% test_names)
-  
+  # keep only samples in the train_names vector
   tempTrain <- tempData %>% filter(TIME_OF_SAMPLING %in% train_names)
-  
+  # Create output data list
   finalData <- list(
     train_data = tempTrain, 
     test_data = tempTest)
-  
+  # write out list to the global work environment
   return(finalData)
 }
 
 # Function to remove near zero variance OTUs
 run_nzv <- function(dataList, train_name, test_name){
+  # the dataList generated from the make_combination function
+  # train_name is the name of the train data
+  # test_name is the name of the test data
   
+  # Pull the training data
   tempTrain <- dataList[[train_name]]
-  groupTrainIDs <- tempTrain$TIME_OF_SAMPLING
-  
+  groupTrainIDs <- tempTrain$TIME_OF_SAMPLING # get the train set group IDs
+  # Pull the test data
   tempTest <- dataList[[test_name]]
-  groupTestIDs <- tempTest$TIME_OF_SAMPLING
-  
+  groupTestIDs <- tempTest$TIME_OF_SAMPLING # get the test set group IDs
+  # Obtain the near zero variance within the train set
   nzv <- nearZeroVar(tempTrain)
-  
+  # Check to see if the length of the nzv variable is 0
   if(length(nzv) == 0){
-    
+    # keeps everything as is
     tempTrain <- tempTrain
     tempTest <- tempTest
     
   } else{
-    
+    # Removes all near zero variance values from train and test sets
     tempTrain <- tempTrain[, -nzv]
     tempTest <- tempTest[, -nzv]
-    
+    # Check if group labels were removed
     if("TIME_OF_SAMPLING" %in% colnames(tempTrain)){
       
       print("groups were not removed...no correction required")
       
     } else{
-      
+      # add the grou labels back to the data set
       tempTrain <- cbind(groupTrainIDs, tempTrain)
       tempTest <- cbind(groupTestIDs, tempTest)
       
       print("groups were removed...correcting this problem")
     }
   }
-  
+  # Create the final data list
   finalData <- list(train_data = tempTrain, 
                     test_data = tempTest)
-  
+  # Output to the global envirnoment
   return(finalData)
 }
 
 
 # Function that builds the model
 make_rf_model <- function(dataList, train_data_name){
+  # dataList is the data list generated from run_nzv
+  # train_data_name is the name of the training set in the list
   
+  # grab the test data and convert the label to mother and child
   tempdata <- dataList[[train_data_name]] %>% 
     mutate(TIME_OF_SAMPLING = factor(TIME_OF_SAMPLING, 
                                      levels = c("1st_tri", "1_month_old"), 
@@ -143,11 +157,15 @@ make_rf_model <- function(dataList, train_data_name){
 
 # Function to create a temp test table with calls used for the train model
 make_temp_test_data <- function(dataList, test_data_name, pattern_key){
+  # dataList is from from data list generated from run_nzv
+  # test_data_name is the name of the test data set
+  # pattern_key is what is assigned child and adult 
   
+  # Generate the temp test data set
   tempData <- dataList[[test_data_name]] %>% 
     mutate(TIME_OF_SAMPLING = stringr::str_replace_all(TIME_OF_SAMPLING, pattern_key), 
            TIME_OF_SAMPLING = factor(TIME_OF_SAMPLING))
-  
+  # write it back out to the global work environment
   return(tempData)
   
 }
