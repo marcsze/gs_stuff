@@ -3,7 +3,7 @@ A repo for the analysis that was done for round 2 of interview
 
 In order to recapitulate the analysis using the Makefile you will need the following installed on your computer beforehand:
 
-* R (v3.4.1)
+* R v3.4.1
 	* tidyverse
 	* caret
 	* randomForest
