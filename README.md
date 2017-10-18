@@ -9,7 +9,7 @@ In order to recapitulate the analysis using the Makefile you will need the follo
 	* randomForest
 * Make v3.8.1
 * ant v1.9.3
-* RDP classifier v 2.12 [GitHub](https://github.com/rdpstaff/classifier)
+* [RDP classifier v 2.12](https://github.com/rdpstaff/classifier)
 
 
 If these are installed typing the command:
