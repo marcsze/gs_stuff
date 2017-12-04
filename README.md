@@ -1,4 +1,4 @@
-# Second Genome Stuff
+# GS Stuff
 A repo for the analysis that was done for round 2 of interview
 
 In order to recapitulate the analysis using the Makefile you will need the following installed on your computer beforehand:
